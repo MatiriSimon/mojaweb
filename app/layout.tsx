@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MojaSyn App",
+  title: "MojaSync App",
   description: "Best fundraising app for everyone",
 };
 
