@@ -18,7 +18,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-white">
       <nav className="flex items-center justify-between px-8 py-4 border-b">
-        <span className="text-xl font-bold">MyApp</span>
+        <span className="text-xl font-bold">One</span>
         <div className="flex gap-4">
           <a href="/login" className="text-sm text-gray-600 hover:text-black">
             Log in
@@ -35,10 +35,10 @@ export default function LandingPage() {
 
       <section className="flex flex-col items-center justify-center py-32 px-4 text-center">
         <h1 className="text-5xl font-bold tracking-tight mb-6">
-          Welcome to MyApp
+          Welcome to One
         </h1>
         <p className="text-xl text-gray-500 max-w-xl mb-10">
-          A powerful platform built with Next.js and Supabase.
+          A powerful platform built for convenience.
         </p>
         <a
           href="/signup"
