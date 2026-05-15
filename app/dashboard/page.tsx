@@ -17,13 +17,15 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .single();
 
   // Example: fetch data from Supabase (BAAS - no custom backend needed)
-  const { data: items } = await supabase
-    .from("items") // replace with your table name
-    .select("*")
-    .eq("user_id", user.id);
-
+  
+  const welcomeName = profiles?.username ?? user.email ?? "there";
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -44,12 +46,8 @@ export default async function DashboardPage() {
 
 
       <div className="max-w-4xl mx-auto py-12 px-4">
-        <h1 className="text-3xl font-bold mb-8">Hello 👋</h1>
+        <h1 className="text-3xl font-bold mb-8">Hello {welcomeName} 👋</h1>
 
-
-        <pre className="bg-white border rounded-xl p-4 text-sm overflow-auto">
-          {JSON.stringify(items ?? [], null, 2)}
-        </pre>
       </div>
     </main>
   );
