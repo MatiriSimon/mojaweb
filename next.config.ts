@@ -1,12 +1,24 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const allowedOrigins = [
+  process.env.NEXT_PUBLIC_ALLOWED_ORIGIN,
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+].filter(Boolean) as string[];
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  output: "standalone",
+  turbopack: {
+    root: process.cwd(),
+  },
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        "refactored-zebra-5g54xg5rjrxqf77xp-3000.app.github.dev", // The domain from your terminal
-        "localhost:3000"
-      ],
+      allowedOrigins,
     },
+  },
+  typescript: {
+    ignoreBuildErrors: false,
   },
 };
 
