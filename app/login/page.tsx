@@ -1,26 +1,28 @@
 import { signIn } from "@/app/auth/actions";
 
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string; redirectTo?: string };
+  searchParams: Promise<{ error?: string; redirectTo?: string }>;
 }) {
+  const { error, redirectTo } = await searchParams;
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border p-8">
         <h1 className="text-2xl font-bold mb-6">Log in</h1>
 
 
-        {searchParams.error && (
+        {error && (
           <p className="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg">
-            {searchParams.error}
+            {error}
           </p>
         )}
 
 
         <form action={signIn} className="flex flex-col gap-4">
-          <input type="hidden" name="redirectTo" value={searchParams.redirectTo ?? "/dashboard"} />
+          <input type="hidden" name="redirectTo" value={redirectTo ?? "/dashboard"} />
 
 
           <div>

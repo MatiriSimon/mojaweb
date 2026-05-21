@@ -1,20 +1,22 @@
 import { signUp } from "@/app/auth/actions";
 
 
-export default function SignupPage({
+export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
+  const { error } = await searchParams;
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border p-8">
         <h1 className="text-2xl font-bold mb-6">Create account</h1>
 
 
-        {searchParams.error && (
+        {error && (
           <p className="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg">
-            {searchParams.error}
+            {error}
           </p>
         )}
 
