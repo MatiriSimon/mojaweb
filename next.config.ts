@@ -22,6 +22,15 @@ const allowedOrigins = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
+    turbopack: {
+    root: process.cwd(),
+  },
+  cacheMaxMemorySize: 52 * 1024 * 1024, // 52MB cache for faster builds
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000, // 60 seconds
+    pagesBufferLength: 5,
+  },
+
   experimental: {
     serverActions: { allowedOrigins },
   },
