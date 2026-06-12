@@ -4,20 +4,23 @@
 "use client";
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
 
 export default function UserProfile() {
-  const [user, setUser] = useState<any>(null);
-  const supabase = createClient();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { auth } = supabase;
+
+    auth.getUser().then(({ data }) => setUser(data.user));
 
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
+    const { data: listener } = auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
       }
@@ -25,7 +28,7 @@ export default function UserProfile() {
 
 
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
 
 
   if (!user) return null;
