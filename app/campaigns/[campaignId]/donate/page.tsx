@@ -1,45 +1,17 @@
-"use client";
-
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { donateCampaign } from "@/app/campaigns/[campaignId]/donate/actions";
 
-export default function DonatePage() {
-  const params = useParams<{ campaignId: string }>();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+interface DonatePageProps {
+  params: { campaignId: string };
+  searchParams: { error?: string; success?: string };
+}
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setMessage(null);
-
-    const form = new FormData(event.currentTarget);
-
-    const response = await fetch("/api/donations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        campaign_id: params.campaignId,
-        amount: Number(form.get("amount") ?? 0),
-        donor_name: String(form.get("donor_name") ?? "").trim(),
-        message: String(form.get("message") ?? "").trim(),
-      }),
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      setMessage(data.error ?? "Donation could not be recorded.");
-      setLoading(false);
-      return;
-    }
-
-    setMessage("Thank you for your donation!");
-    router.push(`/campaigns/${params.campaignId}`);
-    setLoading(false);
-  }
+export default function DonatePage({ params, searchParams }: DonatePageProps) {
+  const message = searchParams.error
+    ? searchParams.error
+    : searchParams.success
+    ? "Thank you for your donation!"
+    : null;
 
   return (
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
@@ -56,8 +28,9 @@ export default function DonatePage() {
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">Make a donation</h1>
           <p className="mt-2 text-gray-600">Your contribution will be recorded securely and added to the campaign total.</p>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <form action={donateCampaign} className="mt-6 space-y-5">
             {message ? <p className="rounded-2xl bg-gray-100 p-3 text-sm text-gray-700">{message}</p> : null}
+            <input type="hidden" name="campaign_id" value={params.campaignId} />
 
             <div className="rounded-2xl bg-gray-50 p-4">
               <label className="mb-1 block text-sm font-medium text-gray-700">Amount (KES)</label>
@@ -71,11 +44,11 @@ export default function DonatePage() {
 
             <div className="rounded-2xl bg-gray-50 p-4">
               <label className="mb-1 block text-sm font-medium text-gray-700">Message (optional)</label>
-              <textarea name="message" rows={4} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="Wishing you strength and support." />
+              <textarea name="message" rows={4} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="Wishing you strength and support."></textarea>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full rounded-xl bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800 disabled:bg-gray-400">
-              {loading ? "Processing donation..." : "Donate now"}
+            <button type="submit" className="w-full rounded-xl bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800">
+              Donate now
             </button>
           </form>
         </div>

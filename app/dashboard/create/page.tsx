@@ -1,6 +1,10 @@
 import CampaignsForm from "@/components/campaigns-form";
 
-export default function CreateCampaignPage() {
+interface CreateCampaignPageProps {
+  searchParams: { error?: string };
+}
+
+export default function CreateCampaignPage({ searchParams }: CreateCampaignPageProps) {
   return (
     <main className="min-h-screen bg-gray-50">
       <nav className="border-b bg-white px-6 py-4">
@@ -14,7 +18,7 @@ export default function CreateCampaignPage() {
           <p className="mt-2 text-gray-600">Use this form to launch a fundraiser for a community project, wedding, funeral, or hospital support.</p>
         </div>
 
-        <CampaignsForm />
+        <CampaignsForm error={searchParams.error} />
       </section>
     </main>
   );
