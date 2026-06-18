@@ -29,12 +29,14 @@ export default function LandingPage() {
 
       <section className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-24 text-center md:py-32">
         <p className="text-sm uppercase tracking-[0.35em] text-gray-500">Fundraising made simple</p>
-        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">Raise support for funerals, weddings, community projects, and hospital bills.</h1>
+        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#39FF14] [text-shadow:0_0_20px_rgba(57,255,20,0.6)] md:text-6xl">
+  Raise support for various causes.
+</h1>
         <p className="mt-6 max-w-2xl text-lg text-gray-600 md:text-xl">Create trusted campaigns, share them with your network, and receive donations through a sleek Supabase-powered platform.</p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <a href="/signup" className="rounded-xl bg-black px-6 py-3 text-base text-white hover:bg-gray-800">Start fundraising</a>
-          <a href="/dashboard" className="rounded-xl border border-gray-200 px-6 py-3 text-base text-gray-700 hover:bg-gray-50">Go to dashboard</a>
+          <a href="/dashboard" className="rounded-xl border border-gray-200 px-6 py-3 text-base text-gray-700 hover:bg-cyan-200">Go to dashboard</a>
         </div>
       </section>
 
