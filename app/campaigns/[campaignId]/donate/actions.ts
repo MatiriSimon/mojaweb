@@ -68,3 +68,5 @@ export async function donateCampaign(formData: FormData) {
 
   redirect(`/campaigns/${campaign_id}?success=true`);
 }
+
+

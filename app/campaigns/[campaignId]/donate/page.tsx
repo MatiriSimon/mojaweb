@@ -23,7 +23,7 @@ export default function DonatePage({ params, searchParams }: DonatePageProps) {
       </nav>
 
       <section className="mx-auto max-w-3xl px-4 py-12">
-        <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="rounded-3xl border  border-gray-200 bg-white p-6 shadow-sm md:p-8">
           <p className="text-[11px] uppercase tracking-[0.35em] text-gray-500">Support the cause</p>
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">Make a donation</h1>
           <p className="mt-2 text-gray-600">Your contribution will be recorded securely and added to the campaign total.</p>
