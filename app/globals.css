@@ -5,7 +5,7 @@
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.141 0.005 285.823);
   
-  /* Custom Brand Colors (Now available as bg-brand-primary, text-brand-primary, etc.) */
+  /* Custom Brand Colors */
   --color-brand-primary: #0f172a;
   --color-brand-secondary: #3b82f6;
   --color-accent-custom: #f59e0b;
@@ -21,28 +21,24 @@
 /* 2. Configure Class-based Dark Mode for v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 3. Handle Theme Overrides in Base Layers */
+/* 3. Handle Theme Overrides */
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
 
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    line-height: 1.5;
-  }
-
-  /* Swap variables when .dark class is active */
+/* 👇 MOVING THIS OUT OF '@layer base' AND INTO '@layer theme' FIXES V4 COMPILE ORDER */
+@layer theme {
   .dark {
     --color-background: oklch(0.141 0.005 285.823);
     --color-foreground: oklch(0.985 0 0);
   }
 }
 
-/* 4. Custom Utilities (Using v4 @utility directive instead of @layer utilities) */
+/* 4. Custom Utilities */
 @utility text-balance {
   text-wrap: balance;
 }

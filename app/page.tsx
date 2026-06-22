@@ -1,42 +1,36 @@
-/*
-const page = () => {
-  return (
-    <div className="fontStyle text-5xl text-center mt-20 font-extrabold">
-      Welcome To The Future!
-    </div>
-  )
-}
-
-export default page
-
-*/
-
 // Public Landing Page (no auth required)
 
 // Server Component — no auth check needed
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      <nav className="border-b bg-white px-8 py-4 shadow-sm">
+    /* 1. CHANGED: Using variables so dark mode actually renders */
+    <main className="min-h-screen bg-background text-foreground">
+      
+      /* 2. CHANGED: Made navbar match background and text */
+      <nav className="border-b border-gray-800 bg-background px-8 py-4 shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <span className="text-xl font-bold tracking-tight">MojaWeb</span>
           <div className="flex items-center gap-4">
-            <a href="/login" className="text-sm text-gray-600 hover:text-black">Log in</a>
-            <a href="/signup" className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800">Get started</a>
+            {/* CHANGED: Made links look good on a dark background */}
+            <a href="/login" className="text-sm text-gray-400 hover:text-white">Log in</a>
+            <a href="/signup" className="rounded-lg bg-brand-secondary px-4 py-2 text-sm text-white hover:opacity-90">Get started</a>
           </div>
         </div>
       </nav>
 
       <section className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-24 text-center md:py-32">
-        <p className="text-sm uppercase tracking-[0.35em] text-gray-500">Fundraising made simple</p>
+        <p className="text-sm uppercase tracking-[0.35em] text-gray-400">Fundraising made simple</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#39FF14] [text-shadow:0_0_20px_rgba(57,255,20,0.6)] md:text-6xl">
-  Raise support for various causes.
-</h1>
-        <p className="mt-6 max-w-2xl text-lg text-gray-600 md:text-xl">Create trusted campaigns, share them with your network, and receive donations through a sleek Supabase-powered platform.</p>
+          Raise support for various causes.
+        </h1>
+        {/* CHANGED: Text tracking description color */}
+        <p className="mt-6 max-w-2xl text-lg text-gray-400 md:text-xl">
+          Create trusted campaigns, share them with your network, and receive donations through a sleek Supabase-powered platform.
+        </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <a href="/signup" className="rounded-xl bg-black px-6 py-3 text-base text-white hover:bg-gray-800">Start fundraising</a>
-          <a href="/dashboard" className="rounded-xl border border-gray-200 px-6 py-3 text-base text-gray-700 hover:bg-cyan-200">Go to dashboard</a>
+          <a href="/signup" className="rounded-xl bg-brand-secondary px-6 py-3 text-base text-white hover:opacity-90">Start fundraising</a>
+          <a href="/dashboard" className="rounded-xl border border-gray-800 px-6 py-3 text-base text-gray-300 hover:bg-gray-900">Go to dashboard</a>
         </div>
       </section>
 
@@ -46,9 +40,10 @@ export default function LandingPage() {
           ["Shareable links", "Send the fundraiser to family, friends, and community members."],
           ["Secure donations", "Track contributions and keep your supporters informed."],
         ].map(([title, copy]) => (
-          <article key={title} className="rounded-3xl border bg-gray-50 p-6 text-left shadow-sm">
-            <h2 className="text-xl font-semibold">{title}</h2>
-            <p className="mt-2 text-sm text-gray-600">{copy}</p>
+          /* 3. CHANGED: Made feature cards a subtle dark color instead of bright gray-50 */
+          <article key={title} className="rounded-3xl border border-gray-800 bg-gray-900/50 p-6 text-left shadow-sm">
+            <h2 className="text-xl font-semibold text-white">{title}</h2>
+            <p className="mt-2 text-sm text-gray-400">{copy}</p>
           </article>
         ))}
       </section>
