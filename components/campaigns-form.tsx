@@ -6,7 +6,7 @@ interface CampaignsFormProps {
 
 export default function CampaignsForm({ error }: CampaignsFormProps) {
   return (
-    <form action={createCampaign} className="space-y-5 rounded-2xl border bg-white p-6 shadow-sm">
+    <form action={createCampaign} className="space-y-5 rounded-2xl border bg-slate-stripes p-6 shadow-sm">
       {error ? <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p> : null}
 
       <div>

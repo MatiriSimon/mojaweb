@@ -17,7 +17,7 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
   const goal = Number(campaign.goal_amount ?? 1);
 
   return (
-    <article className="group rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+    <article className="group rounded-3xl border border-gray-200 bg-slate-stripes p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
       {campaign.image_url ? (
         <Image
           src={campaign.image_url}

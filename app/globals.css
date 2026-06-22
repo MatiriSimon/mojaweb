@@ -2,14 +2,14 @@
 
 /* 1. Define Design System Variables directly inside the theme */
 @theme {
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.141 0.005 285.823);
-  
+  --color-background: oklch(0.2 0.02 240);
+  --color-foreground: oklch(0.985 0 0);
+
   /* Custom Brand Colors */
   --color-brand-primary: #0f172a;
   --color-brand-secondary: #3b82f6;
   --color-accent-custom: #f59e0b;
-  
+
   /* Border Radii */
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
@@ -30,15 +30,26 @@
   }
 }
 
-/* 👇 MOVING THIS OUT OF '@layer base' AND INTO '@layer theme' FIXES V4 COMPILE ORDER */
+/* 4. Dark mode overrides */
 @layer theme {
   .dark {
-    --color-background: oklch(0.141 0.005 285.823);
-    --color-foreground: oklch(0.985 0 0);
+    --color-background: oklch(0.15 0.02 240);
+    --color-foreground: oklch(0.95 0 0);
   }
 }
 
-/* 4. Custom Utilities */
-@utility text-balance {
-  text-wrap: balance;
+/* 5. Custom Utilities */
+@layer utilities {
+  .bg-slate-stripes {
+    background:  radial-gradient(circle at top left,
+     oklch(0.0 0.01 240),
+     oklch(0.4 0.02 240));
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
 }
+
+
+/*background: content-box radial-gradient(crimson, skyblue);*/ 
