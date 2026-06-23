@@ -13,6 +13,20 @@ export default function DonatePage({ params, searchParams }: DonatePageProps) {
     ? "Thank you for your donation!"
     : null;
 
+    /*
+    let message;
+
+      if (searchParams.error) {
+        // If an error exists, use the error text
+        message = searchParams.error; 
+      } else if (searchParams.success) {
+        // If no error, but success exists, show thank you
+        message = "Thank you for your donation!"; 
+      } else {
+        // If neither exists, show nothing
+        message = null; 
+    }*/
+
   return (
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
       <nav className="border-b bg-white/95 px-6 py-4 shadow-sm backdrop-blur">

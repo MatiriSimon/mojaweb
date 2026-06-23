@@ -7,12 +7,12 @@ export async function createCampaign(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const category = String(formData.get("category") ?? "General").trim();
-  const goal_amount = Number(formData.get("goal_amount") ?? 0);
+  const target_amount = Number(formData.get("target_amount") ?? 0);
   const image_url = String(formData.get("image_url") ?? "").trim();
 
-  if (!title || !description || !goal_amount || goal_amount <= 0) {
+  if (!title || !description || !target_amount || target_amount <= 0) {
     const url = new URL("/dashboard/create", process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:3000");
-    url.searchParams.set("error", "Please add a title, description, and a valid goal amount.");
+    url.searchParams.set("error", "Please add a title, description, and a valid target amount.");
     redirect(url.toString());
   }
 
@@ -35,7 +35,7 @@ export async function createCampaign(formData: FormData) {
       title,
       description,
       category,
-      goal_amount,
+      target_amount: target_amount,
       current_amount: 0,
       image_url: image_url || null,
     })

@@ -22,7 +22,7 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
   }
 
   const raised = Number(campaign.current_amount ?? 0);
-  const goal = Number(campaign.goal_amount ?? 1);
+  const target = Number(campaign.target_amount ?? 1);
 
   return (
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
@@ -49,10 +49,10 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
         <aside className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="text-sm text-gray-500">Current progress</p>
           <h2 className="mt-2 text-3xl font-bold text-gray-900">KES {raised.toLocaleString()}</h2>
-          <p className="text-sm text-gray-500">Goal: KES {goal.toLocaleString()}</p>
+          <p className="text-sm text-gray-500">Goal: KES {target.toLocaleString()}</p>
 
           <div className="mt-5 rounded-2xl bg-gray-50 p-4">
-            <ProgressBar current={raised} goal={goal} />
+            <ProgressBar current={raised} goal={target} />
           </div>
 
           <div className="mt-6 rounded-2xl bg-black p-5 text-white">
