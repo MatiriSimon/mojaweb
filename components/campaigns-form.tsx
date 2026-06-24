@@ -11,7 +11,7 @@ export default function CampaignsForm({ error }: CampaignsFormProps) {
 
       <div>
         <label className="mb-1 block text-sm font-medium">Campaign title</label>
-        <input name="title" required className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Funeral support for Mama Akin" />
+        <input name="title" required className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Mary weds John 😋🌹" />
       </div>
 
       <div>
