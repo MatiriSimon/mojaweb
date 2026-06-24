@@ -2,6 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createPortal } from "react-dom";
+
+function buildRedirectPath(path: string, params: Record<string, string> = {}) {
+  const url = new URL(path, "http://localhost:3000");
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  return `${url.pathname}${url.search}`;
+}
 
 export async function createCampaign(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -14,9 +25,11 @@ export async function createCampaign(formData: FormData) {
   const end_date = end_date_str ? new Date(end_date_str) : null;
 
   if (!title || !description || !goal_amount || goal_amount <= 0) {
-    const url = new URL("/dashboard/create", process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:3000");
-    url.searchParams.set("error", "Please add a title, description, and a valid goal amount.");
-    redirect(url.toString());
+    redirect(
+      buildRedirectPath("/dashboard/create", {
+        error: "Please add a title, description, and a valid goal amount.",
+      })
+    );
   }
 
   const supabase = await createClient();
@@ -26,15 +39,17 @@ export async function createCampaign(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    const url = new URL("/login", process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:3000");
-    url.searchParams.set("redirectTo", "/dashboard/create");
-    redirect(url.toString());
+    redirect(
+      buildRedirectPath("/login", {
+        redirectTo: "/dashboard/create",
+      })
+    );
   }
 
   const { error } = await supabase
     .from("campaigns")
     .insert({
-      user_id: user.id,
+      creator_id: user.id,
       title,
       description,
       goal_amount,
@@ -46,9 +61,11 @@ export async function createCampaign(formData: FormData) {
     .single();
 
   if (error) {
-    const url = new URL("/dashboard/create", process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:3000");
-    url.searchParams.set("error", error.message ?? "Unable to create the campaign right now.");
-    redirect(url.toString());
+    redirect(
+      buildRedirectPath("/dashboard/create", {
+        error: error.message ?? "Unable to create the campaign right now.",
+      })
+    );
   }
 
   redirect("/dashboard/my-campaigns");

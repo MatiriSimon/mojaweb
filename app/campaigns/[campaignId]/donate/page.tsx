@@ -3,29 +3,12 @@ import { donateCampaign } from "@/app/campaigns/[campaignId]/donate/actions";
 
 interface DonatePageProps {
   params: { campaignId: string };
-  searchParams: { error?: string; success?: string };
+  searchParams: Promise<{ error?: string; success?: string }>;
 }
 
-export default function DonatePage({ params, searchParams }: DonatePageProps) {
-  const message = searchParams.error
-    ? searchParams.error
-    : searchParams.success
-    ? "Thank you for your donation!"
-    : null;
-
-    /*
-    let message;
-
-      if (searchParams.error) {
-        // If an error exists, use the error text
-        message = searchParams.error; 
-      } else if (searchParams.success) {
-        // If no error, but success exists, show thank you
-        message = "Thank you for your donation!"; 
-      } else {
-        // If neither exists, show nothing
-        message = null; 
-    }*/
+export default async function DonatePage({ params, searchParams }: DonatePageProps) {
+  const { error, success } = await searchParams;
+  const message = error ? error : success ? "Thank you for your donation!" : null;
 
   return (
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
