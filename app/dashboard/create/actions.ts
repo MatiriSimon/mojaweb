@@ -8,6 +8,10 @@ export async function createCampaign(formData: FormData) {
   const description = String(formData.get("description") ?? "").trim();
   const goal_amount = Number(formData.get("goal_amount") ?? 0);
   const cover_image_url = String(formData.get("cover_image_url") ?? "").trim();
+  const end_date_str = String(formData.get("end_date") ?? "").trim();
+
+  // Convert string (e.g. "2026-07-15") into a Date object
+  const end_date = end_date_str ? new Date(end_date_str) : null;
 
   if (!title || !description || !goal_amount || goal_amount <= 0) {
     const url = new URL("/dashboard/create", process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:3000");
@@ -33,9 +37,10 @@ export async function createCampaign(formData: FormData) {
       user_id: user.id,
       title,
       description,
-      goal_amount: goal_amount,
+      goal_amount,
       current_amount: 0,
       cover_image_url: cover_image_url || null,
+      end_date, // <-- new field
     })
     .select("*")
     .single();

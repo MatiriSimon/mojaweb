@@ -6,7 +6,7 @@ interface CampaignsFormProps {
 
 export default function CampaignsForm({ error }: CampaignsFormProps) {
   return (
-    <form action={createCampaign} className="space-y-5 rounded-2xl border bg-slate-stripes p-6 shadow-sm">
+    <form action={createCampaign} className="space-y-5 rounded-2xl border bg-slate-400 p-6 shadow-sm">
       {error ? <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p> : null}
 
       <div>
@@ -15,18 +15,25 @@ export default function CampaignsForm({ error }: CampaignsFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Category</label>
-        <input name="category" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Funeral, Wedding, Hospital, Community" />
-      </div>
-
-      <div>
         <label className="mb-1 block text-sm font-medium">Goal amount (KES)</label>
         <input name="goal_amount" type="number" min="1" required className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="50000" />
       </div>
 
+
       <div>
-        <label className="mb-1 block text-sm font-medium">Image URL</label>
-        <input name="image_url" type="url" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://example.com/image.jpg" />
+        <label className="mb-1 block text-sm font-medium">End date</label>
+        <input
+          name="end_date"
+          type="date"
+          required
+          className="w-full rounded-xl border px-3 py-2 text-sm"
+        />
+     </div>
+
+
+      <div>
+        <label className="mb-1 block text-sm font-medium">Cover Image URL</label>
+        <input name="cover_image_url" type="url" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://example.com/image.jpg" />
       </div>
 
       <div>

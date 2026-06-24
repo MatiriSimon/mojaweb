@@ -9,11 +9,21 @@ type Campaign = {
   goal_amount: number;
   current_amount: number;
   cover_image_url?: string | null;
+  end_date?: string | null; // <-- new field
 };
 
 export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
   const raised = Number(campaign.current_amount ?? 0);
   const goal = Number(campaign.goal_amount ?? 1);
+
+  // Format end date nicely
+  const formattedEndDate = campaign.end_date
+    ? new Date(campaign.end_date).toLocaleDateString("en-KE", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
 
   return (
     <article className="group rounded-3xl border border-gray-200 bg-slate-stripes p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
@@ -43,6 +53,12 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
         <span className="font-medium text-gray-900">KES {raised.toLocaleString()} raised</span>
         <span>Goal KES {goal.toLocaleString()}</span>
       </div>
+
+      {formattedEndDate && (
+        <div className="mt-2 text-sm text-gray-500">
+          Ends on <span className="font-medium">{formattedEndDate}</span>
+        </div>
+      )}
 
       <Link
         href={`/campaigns/${campaign.id}`}
