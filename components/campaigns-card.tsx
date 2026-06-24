@@ -6,10 +6,9 @@ type Campaign = {
   id: string;
   title: string;
   description: string;
-  category?: string | null;
   goal_amount: number;
   current_amount: number;
-  image_url?: string | null;
+  cover_image_url?: string | null;
 };
 
 export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
@@ -18,9 +17,9 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
 
   return (
     <article className="group rounded-3xl border border-gray-200 bg-slate-stripes p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
-      {campaign.image_url ? (
+      {campaign.cover_image_url ? (
         <Image
-          src={campaign.image_url}
+          src={campaign.cover_image_url}
           alt={campaign.title}
           width={600}
           height={240}
@@ -33,7 +32,6 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
         </div>
       )}
 
-      <p className="text-[11px] uppercase tracking-[0.35em] text-gray-500">{campaign.category ?? "General"}</p>
       <h3 className="mt-2 text-xl font-semibold text-gray-900">{campaign.title}</h3>
       <p className="mt-2 text-sm text-gray-600 line-clamp-3">{campaign.description}</p>
 

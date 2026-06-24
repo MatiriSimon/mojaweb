@@ -67,7 +67,7 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
             Donate now
           </Link>
 
-          <p className="mt-4 text-xs text-gray-500">This fundraiser is powered by Supabase and can be shared with family, friends, and community donors.</p>
+          <p className="mt-4 text-xs text-gray-500">This fundraiser can be shared with family, friends, and community donors.</p>
         </aside>
       </section>
     </main>
