@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const { data: campaigns } = await supabase
     .from("campaigns")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("creator_id", user.id)
     .order("created_at", { ascending: false })
     .limit(3);
 
@@ -66,11 +66,11 @@ export default async function DashboardPage() {
             <p className="mt-2 text-sm text-gray-600">Review the campaigns you created and keep them updated.</p>
           </Link>
 
-          <a href="/" className="rounded-3xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+          <Link href="/" className="rounded-3xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <p className="text-sm text-gray-500">Share the app</p>
             <h2 className="mt-2 text-xl font-semibold">Visit the public landing page</h2>
             <p className="mt-2 text-sm text-gray-600">Use the home page to introduce the platform to supporters and donors.</p>
-          </a>
+          </Link>
         </div>
 
         <section className="rounded-3xl border bg-white p-6 shadow-sm">

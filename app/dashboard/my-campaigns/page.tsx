@@ -21,7 +21,7 @@ export default async function MyCampaignsPage() {
   const { data: campaigns, error } = await supabase
     .from("campaigns")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("creator_id", user.id)
     .order("created_at", { ascending: false });
 
   return (
