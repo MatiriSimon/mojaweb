@@ -60,12 +60,20 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
         </div>
       )}
 
-      <Link
-        href={`/campaigns/${campaign.id}`}
-        className="mt-5 inline-flex items-center rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-      >
-        View campaign
-      </Link>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          href={`/campaigns/${campaign.id}`}
+          className="inline-flex items-center rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+        >
+          View campaign
+        </Link>
+        <Link
+          href={`/campaigns/${campaign.id}/donate`}
+          className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
+        >
+          Donate now
+        </Link>
+      </div>
     </article>
   );
 }

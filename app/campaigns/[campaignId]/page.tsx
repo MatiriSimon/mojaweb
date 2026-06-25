@@ -8,7 +8,7 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
 
   const { data: campaign, error } = await supabase
     .from("campaigns")
-    .select("*")
+    .select("id, title, description, category, goal_amount, current_amount, cover_image_url, end_date")
     .eq("id", campaignId)
     .single();
 
@@ -22,7 +22,7 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
   }
 
   const raised = Number(campaign.current_amount ?? 0);
-  const target = Number(campaign.target_amount ?? 1);
+  const goal = Number(campaign.goal_amount ?? 1);
 
   return (
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
@@ -35,8 +35,8 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
 
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[1.05fr_0.95fr]">
         <article className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-          {campaign.image_url ? (
-            <img src={campaign.image_url} alt={campaign.title} className="h-64 w-full rounded-3xl object-cover" />
+          {campaign.cover_image_url ? (
+            <img src={campaign.cover_image_url} alt={campaign.title} className="h-64 w-full rounded-3xl object-cover" />
           ) : (
             <div className="flex h-64 w-full items-center justify-center rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">No image provided</div>
           )}
@@ -49,10 +49,10 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
         <aside className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="text-sm text-gray-500">Current progress</p>
           <h2 className="mt-2 text-3xl font-bold text-gray-900">KES {raised.toLocaleString()}</h2>
-          <p className="text-sm text-gray-500">Goal: KES {target.toLocaleString()}</p>
+          <p className="text-sm text-gray-500">Goal: KES {goal.toLocaleString()}</p>
 
           <div className="mt-5 rounded-2xl bg-gray-50 p-4">
-            <ProgressBar current={raised} goal={target} />
+            <ProgressBar current={raised} goal={goal} />
           </div>
 
           <div className="mt-6 rounded-2xl bg-black p-5 text-white">

@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("username")
+    .select("full_name")
     .eq("id", user.id)
     .single();
 
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(3);
 
-  const welcomeName = profiles?.username ?? user.email ?? "there";
+  const welcomeName = profiles?.full_name ?? user.email ?? "there";
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
