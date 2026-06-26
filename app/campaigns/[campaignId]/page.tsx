@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProgressBar from "@/components/proggress-bar";
 
-export default async function CampaignDetailPage({ params }: { params: Promise<{ campaignId: string }> }) {
+export default async function CampaignDetailsPage({ params }: { params: Promise<{ campaignId: string }> }) {
   const { campaignId } = await params;
   const supabase = await createClient();
 
