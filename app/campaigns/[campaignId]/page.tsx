@@ -8,15 +8,30 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
 
   const { data: campaign, error } = await supabase
     .from("campaigns")
-    .select("id, title, description, category, goal_amount, current_amount, cover_image_url, end_date")
+    .select("id, title, description, goal_amount, current_amount, cover_image_url, end_date")
     .eq("id", campaignId)
     .single();
 
   if (error || !campaign) {
     return (
       <main className="min-h-screen bg-gray-50 p-8 text-center">
-        <h1 className="text-2xl font-bold">Campaign not found</h1>
-        <p className="mt-2 text-gray-600">This fundraiser may have been removed or the link is invalid.</p>
+        <div className="mx-auto max-w-xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+          <p className="text-sm uppercase tracking-[0.35em] text-gray-500">Campaign details</p>
+          <h1 className="mt-3 text-2xl font-bold">We could not load this fundraiser</h1>
+          <p className="mt-3 text-gray-600">
+            The campaign link is valid, but no matching fundraiser was returned from the database yet.
+            This usually means the campaign has not been created or it is not visible to the current session.
+          </p>
+          <p className="mt-4 break-all rounded-2xl bg-gray-50 p-3 text-sm text-gray-500">Requested campaign ID: {campaignId}</p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Link href="/dashboard" className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+              Back to dashboard
+            </Link>
+            <Link href="/" className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Go home
+            </Link>
+          </div>
+        </div>
       </main>
     );
   }
@@ -41,7 +56,7 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
             <div className="flex h-64 w-full items-center justify-center rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">No image provided</div>
           )}
 
-          <p className="mt-5 text-[11px] uppercase tracking-[0.35em] text-gray-500">{campaign.category ?? "General"}</p>
+          
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">{campaign.title}</h1>
           <p className="mt-4 text-gray-700">{campaign.description}</p>
         </article>

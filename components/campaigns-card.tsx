@@ -9,12 +9,13 @@ type Campaign = {
   goal_amount: number;
   current_amount: number;
   cover_image_url?: string | null;
-  end_date?: string | null; // <-- new field
+  end_date?: string | null; // -- new field
 };
 
 export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
   const raised = Number(campaign.current_amount ?? 0);
   const goal = Number(campaign.goal_amount ?? 1);
+  const campaignPath = `/campaigns/${encodeURIComponent(campaign.id)}`;
 
   // Format end date nicely
   const formattedEndDate = campaign.end_date
@@ -62,13 +63,13 @@ export default function CampaignsCard({ campaign }: { campaign: Campaign }) {
 
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
-          href={`/campaigns/${campaign.id}`}
+          href={campaignPath}
           className="inline-flex items-center rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           View campaign
         </Link>
         <Link
-          href={`/campaigns/${campaign.id}/donate`}
+          href={`${campaignPath}/donate`}
           className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 transition hover:bg-gray-50"
         >
           Donate now
