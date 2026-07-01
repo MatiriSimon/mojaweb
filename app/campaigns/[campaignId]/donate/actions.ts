@@ -15,7 +15,12 @@ export async function donateCampaign(formData: FormData) {
   const campaign_id = String(formData.get("campaign_id") ?? "").trim();
   const amount = Number(formData.get("amount") ?? 0);
   const donor_name = String(formData.get("donor_name") ?? "").trim();
-  const message = String(formData.get("message") ?? "").trim();
+  let message = String(formData.get("message") ?? "").trim();
+
+  // Validate message length (max 50 chars per schema)
+  if (message.length > 50) {
+    message = message.substring(0, 50);
+  }
 
   if (!campaign_id || !amount || amount <= 0) {
     redirect(buildRedirectPath(`/campaigns/${campaign_id}/donate`, { error: "Please enter a valid donation amount." }));
@@ -29,22 +34,22 @@ export async function donateCampaign(formData: FormData) {
 
   // --- STEP 1: RESOLVE OR CREATE DONOR PROFILE ---
   if (user) {
-    // If user is logged in, check if they already have a profile in our custom 'donors' table
+    // If user is logged in, check if they already have a donor record linked to their profile
     const { data: existingDonor } = await supabase
       .from("donors")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("profiles_id", user.id)
       .maybeSingle();
 
     if (existingDonor) {
       finalDonorId = existingDonor.id;
     } else {
-      // First-time logged-in donor: create their profile linked via user_id
+      // First-time logged-in donor: create their donor profile linked via profiles_id
       const { data: newDonor, error: donorErr } = await supabase
         .from("donors")
         .insert({
-          user_id: user.id, // Authenticated Foreign Key matched here
-          name: standardName,
+          profiles_id: user.id, // Link to the auth user profile
+          full_name: standardName,
           email: user.email
         })
         .select("id")
@@ -54,12 +59,12 @@ export async function donateCampaign(formData: FormData) {
       finalDonorId = newDonor.id;
     }
   } else {
-    // Guest User: Always create a fresh profile where user_id foreign key defaults to NULL
+    // Guest User: Always create a fresh donor record with profiles_id as null
     const { data: guestDonor, error: guestErr } = await supabase
       .from("donors")
       .insert({
-        user_id: null, // Left null explicitly for guest row requirement
-        name: standardName,
+        profiles_id: null, // No linked profile for guests
+        full_name: standardName,
         email: null
       })
       .select("id")
@@ -69,10 +74,10 @@ export async function donateCampaign(formData: FormData) {
     finalDonorId = guestDonor.id;
   }
 
-  // --- STEP 2: FETCH CAMPAIGN BALANCE ---
+  // --- STEP 2: FETCH CAMPAIGN BALANCE AND TITLE ---
   const { data: campaign, error: campaignError } = await supabase
     .from("campaigns")
-    .select("id, current_amount")
+    .select("id, title, current_amount")
     .eq("id", campaign_id)
     .single();
 
@@ -80,15 +85,19 @@ export async function donateCampaign(formData: FormData) {
     redirect(buildRedirectPath(`/campaigns/${campaign_id}/donate`, { error: "Campaign not found." }));
   }
 
-  // --- STEP 3: INSERT TRANSACTION LEDGER ---
+  // --- STEP 3: INSERT DONATION RECORD ---
   const { error: donationError } = await supabase
     .from("donations")
     .insert({
       campaign_id,
-      donor_id: finalDonorId, // Always populated with a UUID key pointing to 'donors'
+      donor_id: finalDonorId, // Always populated with a UUID key pointing to 'donors' table
       donor_name: standardName,
+      campaign_title: campaign.title,
       amount,
-      message,
+      currency: "KES",
+      gateway: "stripe", // Payment gateway (required field)
+      payment_status: "pending",
+      message: message || null,
     });
 
   if (donationError) {

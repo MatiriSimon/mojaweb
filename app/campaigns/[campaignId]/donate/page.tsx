@@ -7,6 +7,7 @@ interface DonatePageProps {
 }
 
 export default async function DonatePage({ params, searchParams }: DonatePageProps) {
+  const { campaignId } = await params;
   const { error, success } = await searchParams;
   const message = error ? error : success ? "Thank you for your donation!" : null;
 
@@ -14,7 +15,7 @@ export default async function DonatePage({ params, searchParams }: DonatePagePro
     <main className="min-h-screen bg-linear-to-b from-gray-50 to-white text-gray-900">
       <nav className="border-b bg-white/95 px-6 py-4 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <Link href={`/campaigns/${params.campaignId}`} className="text-sm text-gray-600 hover:text-black">← Back to campaign</Link>
+          <Link href={`/campaigns/${campaignId}`} className="text-sm text-gray-600 hover:text-black">← Back to campaign</Link>
           <span className="rounded-full bg-gray-100 px-3 py-1 text-xs uppercase tracking-[0.35em] text-gray-500">Donate</span>
         </div>
       </nav>
@@ -27,7 +28,7 @@ export default async function DonatePage({ params, searchParams }: DonatePagePro
 
           <form action={donateCampaign} className="mt-6 space-y-5">
             {message ? <p className="rounded-2xl bg-gray-100 p-3 text-sm text-gray-700">{message}</p> : null}
-            <input type="hidden" name="campaign_id" value={params.campaignId} />
+            <input type="hidden" name="campaign_id" value={campaignId} />
 
             <div className="rounded-2xl bg-gray-50 p-4">
               <label className="mb-1 block text-sm font-medium text-gray-700">Amount (KES)</label>
