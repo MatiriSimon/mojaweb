@@ -96,7 +96,7 @@ export async function donateCampaign(formData: FormData) {
       amount,
       currency: "KES",
       gateway: "stripe", // Payment gateway (required field)
-      payment_status: "pending",
+      payment_status: "completed",
       message: message || null,
     });
 
