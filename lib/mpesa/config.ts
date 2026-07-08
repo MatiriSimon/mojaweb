@@ -13,6 +13,7 @@ export interface MpesaConfig {
 
 export function getMpesaConfig(): MpesaConfig {
   const environment = (process.env.MPESA_ENV ?? "sandbox") as MpesaEnvironment;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   return {
     consumerKey: process.env.MPESA_CONSUMER_KEY ?? "",
@@ -20,7 +21,7 @@ export function getMpesaConfig(): MpesaConfig {
     shortcode: process.env.MPESA_SHORTCODE ?? "",
     passkey: process.env.MPESA_PASSKEY ?? "",
     environment,
-    callbackUrl: process.env.MPESA_CALLBACK_URL ?? "http://localhost:3000/api/mpesa/callback",
+    callbackUrl: process.env.MPESA_CALLBACK_URL ?? `${appUrl.replace(/\/$/, "")}/api/mpesa/callback`,
   };
 }
 

@@ -1,6 +1,7 @@
 // optional, for checking the payment status later.
 
 import { NextResponse } from "next/server";
+import { queryTransactionStatus } from "@/lib/mpesa/client";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -10,9 +11,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "checkoutRequestId is required." }, { status: 400 });
   }
 
+  const payment = await queryTransactionStatus(checkoutRequestId);
+
   return NextResponse.json({
-    ok: true,
+    ok: payment.ok,
     checkoutRequestId,
-    message: "Status check endpoint scaffold. Replace this with a real Daraja status query when you are ready.",
+    status: payment.status,
+    data: payment.data,
   });
 }
