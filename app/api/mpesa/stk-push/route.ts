@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     } else {
       const { data: guestDonor, error: guestError } = await supabase
         .from("donors")
-        .insert({ profiles_id: null, full_name: standardName, email: null })
+        .insert({ profiles_id: null, full_name: standardName, email: null, phone_number: normalizedPhone })
         .select("id")
         .single();
 
@@ -109,12 +109,26 @@ export async function POST(request: Request) {
     }
 
     // 2. Fire STK push passing donation.id as the reference
+    console.log("M-Pesa STK push request:", {
+      phone: normalizedPhone,
+      amount,
+      accountReference: donation.id,
+      transactionDesc: `Donation for ${campaign.title}`,
+    });
+
     const payment = await initiateStkPush({
       phone: normalizedPhone,
       amount,
       accountReference: donation.id, // Fixed: Scoped tracking identifier
       transactionDesc: `Donation for ${campaign.title}`,
     });
+
+    console.log("M-Pesa STK push response:", payment);
+    if (payment.ok) {
+      console.log("M-Pesa STK push succeeded:", payment.data);
+    } else {
+      console.log("M-Pesa STK push failed:", payment.status, payment.data);
+    }
 
     if (!payment.ok || !payment.data?.CheckoutRequestID) {
       return NextResponse.redirect(new URL(buildRedirectPath(`/campaigns/${campaignId}/donate`, { error: "Unable to start M-Pesa payment request." }, baseUrl), baseUrl));

@@ -137,6 +137,8 @@ export async function initiateStkPush(params: InitiateStkPushParams) {
     TransactionDesc: params.transactionDesc,
   };
 
+  console.log("M-Pesa STK push payload:", payload);
+
   const response = await fetch(`${getMpesaBaseUrl()}/mpesa/stkpush/v1/processrequest`, {
     method: "POST",
     headers: {
