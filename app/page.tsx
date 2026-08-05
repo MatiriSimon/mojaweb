@@ -25,7 +25,7 @@ export default async function LandingPage() {
             </a>
             <a
               href="/signup"
-              className="rounded-lg bg-brand-secondary px-4 py-2 text-sm text-white hover:opacity-90"
+              className="rounded-lg bg-brand-secondary px-4 py-2 text-sm text-black hover:opacity-90"
             >
               Get started
             </a>
@@ -50,13 +50,14 @@ export default async function LandingPage() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <a
             href="/signup"
-            className="rounded-xl bg-brand-secondary px-6 py-3 text-base text-white hover:opacity-90"
+            className="rounded-xl bg-brand-secondary px-6 py-3 text-base text-black hover:opacity-90"
           >
             Start campaign
           </a>
           <a
             href="/dashboard"
-            className="rounded-xl bg-brand-secondary border border-gray-800 px-6 py-3 text-base text-gray-300 hover:opacity-90"
+            className="rounded-xl bg-brand-secondary border
+             border-gray-800 px-6 py-3 text-base text-gray-800 hover:opacity-90"
           >
             Go to dashboard
           </a>
