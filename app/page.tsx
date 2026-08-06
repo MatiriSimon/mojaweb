@@ -20,7 +20,7 @@ export default async function LandingPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <span className="text-xl font-bold tracking-tight">MojaWeb</span>
           <div className="flex items-center gap-4">
-            <a href="/login" className="text-sm border border-brand-secondary text-white hover:opacity-90  rounded-lg px-4 py-1.5">
+            <a href="/login" className="text-sm border border-brand-secondary text-cyan-200 hover:opacity-90  rounded-lg px-4 py-1.5">
               Log in
             </a>
             <a
@@ -56,12 +56,8 @@ export default async function LandingPage() {
           </a>
           <a
             href="/dashboard"
-<<<<<<< HEAD
-            className="rounded-xl bg-brand-secondary border border-gray-800 px-6 py-3 text-base text-black hover:opacity-90"
-=======
             className="rounded-xl bg-brand-secondary border
-             border-gray-800 px-6 py-3 text-base text-gray-800 hover:opacity-90"
->>>>>>> d5caf20955edcf4fc4217af062eb9e80f35227d9
+             border-gray-800 px-6 py-3 text-base text-black hover:opacity-90"
           >
             Go to dashboard
           </a>
