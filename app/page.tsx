@@ -56,7 +56,12 @@ export default async function LandingPage() {
           </a>
           <a
             href="/dashboard"
+<<<<<<< HEAD
             className="rounded-xl bg-brand-secondary border border-gray-800 px-6 py-3 text-base text-black hover:opacity-90"
+=======
+            className="rounded-xl bg-brand-secondary border
+             border-gray-800 px-6 py-3 text-base text-gray-800 hover:opacity-90"
+>>>>>>> d5caf20955edcf4fc4217af062eb9e80f35227d9
           >
             Go to dashboard
           </a>
