@@ -39,19 +39,23 @@ export async function POST(request: Request) {
         .from("donations")
         .update({ 
           payment_status: paymentStatus,
-          mpesa_receipt: mpesaReceiptNumber 
+          mpesa_receipt_number: mpesaReceiptNumber 
         })
         .eq("checkout_request_id", checkoutRequestId)
         .eq("payment_status", "pending");
     }
 
     // Safaricom expects a specific JSON pattern returned back to acknowledge receipt
+    console.log("Mpesa Receipt Number:", mpesaReceiptNumber);
     return NextResponse.json({
       MerchantRequestID: callback.MerchantRequestID,
       CheckoutRequestID: checkoutRequestId,
       ResultCode: 0,
-      ResultDesc: resultDesc // Used resultDesc here to satisfy the unused warning!
+      ResultDesc: resultDesc
     });
+
+    
+    
     
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
