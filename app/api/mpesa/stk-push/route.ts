@@ -100,6 +100,8 @@ export async function POST(request: Request) {
         gateway: "mpesa",
         payment_status: "pending",
         message: message || null,
+        checkout_request_id: null, // Will be updated after STK push
+        mpesa_receipt: null, // Will be updated after successful payment
       })
       .select("id")
       .single();
