@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { error } from "console";
+
 
 // Define the shape of Safaricom's metadata item array elements
 interface MpesaCallbackItem {
@@ -50,6 +50,8 @@ export async function POST(request: Request) {
         
     }
 */
+
+/*
     if (checkoutRequestId) {
       const {data, error } = await supabase
         .from("donations")
@@ -77,7 +79,8 @@ export async function POST(request: Request) {
       }   
         
   }
-/*
+  */
+
      if (checkoutRequestId) {
       const { data, error, count } = await supabase
         .from("donations")
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
           gateway_transaction_id: mpesaReceiptNumber
         })
         .eq("checkout_request_id", checkoutRequestId)
+        .eq("payment_status", "pending")
         .select("id"); // Add .select() to get proper count
 
       console.log("donations Supabase update result:", {
@@ -103,7 +107,7 @@ export async function POST(request: Request) {
       }
     }
 
-    */
+    
     // Safaricom expects a specific JSON pattern returned back to acknowledge receipt
     console.log("Mpesa Receipt Number:", mpesaReceiptNumber);
     return NextResponse.json({
