@@ -8,7 +8,7 @@ export async function getPesapalToken(): Promise<string> {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',
-            'accept': 'application/json',
+             Accept: 'application/json',
         },
         body: JSON.stringify({
             consumer_key: process.env.PESAPAL_CONSUMER_KEY,
@@ -16,5 +16,22 @@ export async function getPesapalToken(): Promise<string> {
         }),
     })
     const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to authenticate with Pesapal');
     return data.token;
+}
+
+export async function submitOrder(orderDetails: any){
+    const token = await getPesapalToken();
+    const response = await fetch(`${PESAPAL_BASE_URL}/api/Transactions/SubmitOrderRequest`, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(orderDetails),
+    })
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to submit order to Pesapal');
+    return data;
 }
