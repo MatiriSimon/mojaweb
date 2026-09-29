@@ -25,6 +25,7 @@ export async function submitOrder(orderDetails: any){
     const response = await fetch(`${PESAPAL_BASE_URL}/api/Transactions/SubmitOrderRequest`, {
         method: 'POST',
         headers: {
+            'content-type': 'applicatioin/json',
             Accept: 'application/json',
             Authorization: `Bearer ${token}`
         },
