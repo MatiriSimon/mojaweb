@@ -1,12 +1,15 @@
 // Handles Instant Payment Notifications (IPN) for transaction status updates.
 
+import { NextResponse } from "next/server";
+import { getTransactionStatus } from "@/lib/pesapal/pesapal"
+
 export async function GET (request: Request) {
     const { searchParams } = new URL(request.url);
     const orderTrackingId = searchParams.get('orderTrackingId');
     const orderMerchantReference = searchParams.get('orderMerchantReference');
 
     try {
-        if (!orderTrackingID) {
+        if (!orderTrackingId) {
             return NextResponse.json({ error: "Missing orderTrackingID parameter"}, {status: 400});
         }
 
@@ -20,7 +23,7 @@ export async function GET (request: Request) {
             statusResponse,
         })
     } catch (error: any) {
-        return NextResponse.json({ error: erro.message }, { status: 500});
+        return NextResponse.json({ error: error.message }, { status: 500});
         }
 }
 

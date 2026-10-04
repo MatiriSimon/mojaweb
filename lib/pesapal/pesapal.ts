@@ -1,4 +1,4 @@
-import { error } from "console";
+
 
 const PESAPAL_BASE_URL = process.env.PESAPAL_ENV  === 'live'
     ?'https://pay.pesapal.com/v3'
