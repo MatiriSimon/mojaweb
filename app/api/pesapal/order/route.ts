@@ -11,7 +11,7 @@ export async function POST(request: Request) {
         currency: body.currency || "KES",
         amount: body.amount,
         description: body.description || "Order Payment",
-        callback_urL: `${process.env.NEXT_PUBLIC_APP_URL}/api/pesapal/response`,
+        callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/pesapal/response`,
         notification_id: process.env.PESAPAL_IPN_ID,
         billing_address: {
             email_address: body.email,

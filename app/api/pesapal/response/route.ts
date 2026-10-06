@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const orderTrackingId = searchParams.get('orderTrackingId');
     const orderMerchantReference = searchParams.get('orderMerchantReference');
 
-    const baseUrl = process.env.NEXT_PUBLIC_URL || '';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || '';
 
     try {
         if (!orderTrackingId) {

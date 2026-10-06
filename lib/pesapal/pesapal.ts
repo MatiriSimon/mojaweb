@@ -6,7 +6,7 @@ const PESAPAL_BASE_URL = process.env.PESAPAL_ENV  === 'live'
 
 export async function getPesapalToken(): Promise<string> {
     
-    const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/Request token`, {
+    const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/RequestToken`, {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',
@@ -27,7 +27,7 @@ export async function submitOrder(orderDetails: any){
     const response = await fetch(`${PESAPAL_BASE_URL}/api/Transactions/SubmitOrderRequest`, {
         method: 'POST',
         headers: {
-            'content-type': 'applicatioin/json',
+            'content-type': 'application/json',
             Accept: 'application/json',
             Authorization: `Bearer ${token}`
         },
