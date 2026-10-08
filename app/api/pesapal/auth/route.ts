@@ -1,4 +1,4 @@
-// Handles RequestToken from Pesapal.
+ // Handles RequestToken from Pesapal.
 
 import { getPesapalToken } from "@/lib/pesapal/pesapal";
 import { NextResponse } from "next/server";
