@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 export async function GET(){
     try {
         const token =await getPesapalToken();
+        
         return NextResponse.json({Success: true, token});
 
     } catch (error: any) {

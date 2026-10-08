@@ -4,6 +4,33 @@ const PESAPAL_BASE_URL = process.env.PESAPAL_ENV  === 'live'
     ?'https://pay.pesapal.com/v3'
     : 'https://cybqa.pesapal.com/pesapalv3';
 
+
+    export async function getPesapalToken(): Promise<string> {
+  const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/RequestToken`, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      consumer_key: process.env.PESAPAL_CONSUMER_KEY,
+      consumer_secret: process.env.PESAPAL_CONSUMER_SECRET,
+    }),
+  });
+
+  const text = await response.text();
+  console.log('Pesapal raw response:', text);
+
+  const data = JSON.parse(text);
+  console.log('Parsed response:', data);
+
+  if (!response.ok) throw new Error(data.message || 'Failed to authenticate with Pesapal');
+
+  return data.token;
+}
+
+    /*
+
 export async function getPesapalToken(): Promise<string> {
     
     const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/RequestToken`, {
@@ -21,6 +48,9 @@ export async function getPesapalToken(): Promise<string> {
     if (!response.ok) throw new Error(data.message || 'Failed to authenticate with Pesapal');
     return data.token;
 }
+
+
+*/
 
 export async function submitOrder(orderDetails: any){
     const token = await getPesapalToken();
