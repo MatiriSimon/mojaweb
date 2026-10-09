@@ -4,8 +4,8 @@ const PESAPAL_BASE_URL = process.env.PESAPAL_ENV  === 'live'
     ?'https://pay.pesapal.com/v3'
     : 'https://cybqa.pesapal.com/pesapalv3';
 
-
-    export async function getPesapalToken(): Promise<string> {
+/*
+ export async function getPesapalToken(): Promise<string> {
   const response = await fetch(`${PESAPAL_BASE_URL}/api/Auth/RequestToken`, {
     method: 'POST',
     headers: {
@@ -29,7 +29,7 @@ const PESAPAL_BASE_URL = process.env.PESAPAL_ENV  === 'live'
   return data.token;
 }
 
-    /*
+    */
 
 export async function getPesapalToken(): Promise<string> {
     
@@ -46,11 +46,17 @@ export async function getPesapalToken(): Promise<string> {
     })
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to authenticate with Pesapal');
+    console.log('Pesapal token response:', data);
+
+    if (!data?.token) {
+        throw new Error(data?.error?.message || data?.message || 'Invalid Pesapal credentials');
+    }
+
     return data.token;
 }
 
 
-*/
+
 
 export async function submitOrder(orderDetails: any){
     const token = await getPesapalToken();
