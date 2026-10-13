@@ -22,9 +22,12 @@ export async function POST(request: Request) {
 
     };
     const response = await submitOrder(orderPayload);
+    console.info("[Pesapal] Order submitted successfully.");
     return NextResponse.json({ success: true, data: response});
 
-} catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message}, { status: 500 });
+} catch (error: unknown) {
+    console.error("[Pesapal] Order submission failed:", error);
+    const message = error instanceof Error ? error.message : "Pesapal order submission failed";
+    return NextResponse.json({ success: false, error: message}, { status: 500 });
     };
 }

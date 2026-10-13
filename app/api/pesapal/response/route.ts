@@ -15,15 +15,23 @@ export async function GET(request: Request) {
         }
 
         const statusResponse = await getTransactionStatus(orderTrackingId);
+        const paymentComplete = statusResponse.status_code === '1'
+            || statusResponse.payment_status_description === 'Completed';
+        console.info("[Pesapal] Callback processed:", {
+            paymentStatus: statusResponse.payment_status_description,
+            paymentComplete,
+        });
 
-        if(statusResponse.status_code === '1' || statusResponse.payment_status_descript
-             === 'Completed') {
+        if(paymentComplete) {
             return NextResponse.redirect(`${baseUrl}/checkout/success?trackingId=${orderTrackingId}&ref=${orderMerchantReference}`);
         } else {
             return NextResponse.redirect(`${baseUrl}/checkout/failed?trackingId=${orderTrackingId}&ref=${orderMerchantReference}`);
+           
         } 
 
-    } catch (error: any) {
-            return NextResponse.redirect(`${baseUrl}/checkout/failed?error=${encodeURIComponent(error.message)}`);
-        }
+    } catch (error: unknown) {
+        console.error("[Pesapal] Callback status lookup failed:", error);
+        const message = error instanceof Error ? error.message : "Pesapal status lookup failed";
+        return NextResponse.redirect(`${baseUrl}/checkout/failed?error=${encodeURIComponent(message)}`);
+    }
 }

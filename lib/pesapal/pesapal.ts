@@ -45,8 +45,9 @@ export async function getPesapalToken(): Promise<string> {
         }),
     })
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to authenticate with Pesapal');
-    console.log('Pesapal token response:', data);
+    if (!response.ok) {
+        throw new Error(`${data.message || 'Failed to authenticate with Pesapal'} (HTTP ${response.status})`);
+    }
 
     if (!data?.token) {
         throw new Error(data?.error?.message || data?.message || 'Invalid Pesapal credentials');
@@ -58,7 +59,7 @@ export async function getPesapalToken(): Promise<string> {
 
 
 
-export async function submitOrder(orderDetails: any){
+export async function submitOrder(orderDetails: object){
     const token = await getPesapalToken();
     const response = await fetch(`${PESAPAL_BASE_URL}/api/Transactions/SubmitOrderRequest`, {
         method: 'POST',
@@ -70,7 +71,9 @@ export async function submitOrder(orderDetails: any){
         body: JSON.stringify(orderDetails),
     })
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to submit order to Pesapal');
+    if (!response.ok) {
+        throw new Error(`${data.message || 'Failed to submit order to Pesapal'} (HTTP ${response.status})`);
+    }
     return data;
 }
 
@@ -86,6 +89,8 @@ export async function getTransactionStatus(orderTrackingId: string) {
     })
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch transaction status');
+    if (!response.ok) {
+        throw new Error(`${data.message || 'Failed to fetch transaction status'} (HTTP ${response.status})`);
+    }
     return data;
 }

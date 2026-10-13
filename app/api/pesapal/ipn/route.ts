@@ -14,6 +14,9 @@ export async function GET (request: Request) {
         }
 
         const statusResponse = await getTransactionStatus(orderTrackingId);
+        console.info("[Pesapal] IPN status retrieved successfully:", {
+            paymentStatus: statusResponse.payment_status_description,
+        });
 
         return NextResponse.json({
             status: 200,
@@ -22,8 +25,9 @@ export async function GET (request: Request) {
             orderMerchantReference,
             statusResponse,
         })
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500});
+    } catch (error: unknown) {
+        console.error("[Pesapal] IPN status lookup failed:", error);
+        const message = error instanceof Error ? error.message : "Pesapal status lookup failed";
+        return NextResponse.json({ error: message }, { status: 500});
         }
 }
-
