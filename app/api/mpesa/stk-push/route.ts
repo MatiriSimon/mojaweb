@@ -156,3 +156,318 @@ export async function POST(request: Request) {
     //Also in production, change to trusted domain, e.g., https://yourdomain.com
   }
 }
+
+/*
+THIS IS GENERALLY PASTED HERE JUST TO REVEAL A SAFER STK PUSH MODULE THAT DOES NOT RELY ON UNTRUSTED REQUEST HEADERS OR FALLBACKS TO LOCALHOST.
+MOSTLY THE TARGET CONFUSION ELIMINATION IS const contentType = request.headers.get("content-type") ?? ""; 
+and
+const headerStore = await headers();
+    const forwardedHost = headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "localhost:3000";
+    const forwardedProto = headerStore.get("x-forwarded-proto") ?? "http";
+    const baseUrl = `${forwardedProto}://${forwardedHost}`;
+
+
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import {
+  initiateStkPush,
+  normalizePhoneNumber,
+} from "@/lib/mpesa/client";
+
+function getAppUrl(): string {
+  const appUrl = process.env.APP_URL;
+
+  if (!appUrl) {
+    throw new Error("APP_URL environment variable is not configured.");
+  }
+
+  const url = new URL(appUrl);
+
+  if (
+    url.protocol !== "https:" &&
+    url.hostname !== "localhost" &&
+    url.hostname !== "127.0.0.1"
+  ) {
+    throw new Error("APP_URL must use HTTPS in production.");
+  }
+
+  return url.origin;
+}
+
+function buildRedirectPath(
+  path: string,
+  baseUrl: string,
+  params: Record<string, string> = {}
+): string {
+  const url = new URL(path, baseUrl);
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  return url.toString();
+}
+
+function redirectToDonation(
+  baseUrl: string,
+  campaignId: string,
+  params: Record<string, string>
+) {
+  const path = `/campaigns/${encodeURIComponent(campaignId)}/donate`;
+
+  return NextResponse.redirect(
+    buildRedirectPath(path, baseUrl, params)
+  );
+}
+
+async function readRequestBody(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return request.json().catch(() => ({}));
+  }
+
+  const formData = await request.formData().catch(() => null);
+
+  if (!formData) return {};
+
+  return Object.fromEntries(formData.entries());
+}
+
+export async function POST(request: Request) {
+  let campaignId = "";
+  let baseUrl: string;
+
+  try {
+    // Use a trusted environment variable, not request host headers.
+    baseUrl = getAppUrl();
+
+    const body = await readRequestBody(request);
+
+    campaignId = String(
+      body.campaignId ?? body.campaign_id ?? ""
+    ).trim();
+
+    const amount = Number(body.amount ?? 0);
+    const phone = String(body.phone ?? "").trim();
+    const donorName = String(
+      body.donorName ?? body.donor_name ?? ""
+    ).trim();
+    const message = String(body.message ?? "").trim();
+
+    const normalizedPhone = normalizePhoneNumber(phone);
+
+    if (!campaignId || !amount || amount <= 0 || !normalizedPhone) {
+      return redirectToDonation(baseUrl, campaignId, {
+        error: "Campaign ID, amount and phone number are required.",
+      });
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    let donorId: string | null = null;
+
+    const standardName =
+      donorName ||
+      user?.email?.split("@")[0] ||
+      "Anonymous Guest";
+
+    if (user) {
+      const { data: existingDonor } = await supabase
+        .from("donors")
+        .select("id")
+        .eq("profiles_id", user.id)
+        .maybeSingle();
+
+      if (existingDonor) {
+        donorId = existingDonor.id;
+      } else {
+        const { data: newDonor, error: donorError } =
+          await supabase
+            .from("donors")
+            .insert({
+              profiles_id: user.id,
+              full_name: standardName,
+              email: user.email,
+            })
+            .select("id")
+            .single();
+
+        if (donorError || !newDonor) {
+          console.error("Donor creation failed:", donorError);
+
+          return redirectToDonation(baseUrl, campaignId, {
+            error: "Unable to create donor profile.",
+          });
+        }
+
+        donorId = newDonor.id;
+      }
+    } else {
+      const { data: guestDonor, error: guestError } =
+        await supabase
+          .from("donors")
+          .insert({
+            profiles_id: null,
+            full_name: standardName,
+            email: null,
+            phone_number: normalizedPhone,
+          })
+          .select("id")
+          .single();
+
+      if (guestError || !guestDonor) {
+        console.error("Guest donor creation failed:", guestError);
+
+        return redirectToDonation(baseUrl, campaignId, {
+          error: "Unable to create guest donor profile.",
+        });
+      }
+
+      donorId = guestDonor.id;
+    }
+
+    const { data: campaign, error: campaignError } =
+      await supabase
+        .from("campaigns")
+        .select("id, title")
+        .eq("id", campaignId)
+        .single();
+
+    if (campaignError || !campaign) {
+      return redirectToDonation(baseUrl, campaignId, {
+        error: "Campaign not found.",
+      });
+    }
+
+    // 1. Create a pending donation record.
+    const { data: donation, error: donationError } =
+      await supabase
+        .from("donations")
+        .insert({
+          campaign_id: campaignId,
+          donor_id: donorId,
+          donor_name: standardName,
+          campaign_title: campaign.title,
+          amount,
+          currency: "KES",
+          gateway: "mpesa",
+          payment_status: "pending",
+          message: message || null,
+          checkout_request_id: null,
+          mpesa_receipt: null,
+        })
+        .select("id")
+        .single();
+
+    if (donationError || !donation) {
+      console.error("Donation creation failed:", donationError);
+
+      return redirectToDonation(baseUrl, campaignId, {
+        error:
+          donationError?.message ??
+          "Unable to create donation record.",
+      });
+    }
+
+    // 2. Initiate the M-Pesa STK push.
+    console.log("M-Pesa STK push request:", {
+      phone: normalizedPhone,
+      amount,
+      accountReference: donation.id,
+      transactionDesc: `Donation for ${campaign.title}`,
+    });
+
+    const payment = await initiateStkPush({
+      phone: normalizedPhone,
+      amount,
+      accountReference: donation.id,
+      transactionDesc: `Donation for ${campaign.title}`,
+    });
+
+    console.log("M-Pesa STK push response:", payment);
+
+    if (payment.ok) {
+      console.log("M-Pesa STK push succeeded:", payment.data);
+    } else {
+      console.error(
+        "M-Pesa STK push failed:",
+        payment.status,
+        payment.data
+      );
+    }
+
+    if (!payment.ok || !payment.data?.CheckoutRequestID) {
+      return redirectToDonation(baseUrl, campaignId, {
+        error: "Unable to start M-Pesa payment request.",
+      });
+    }
+
+    // 3. Save the checkout tracking ID.
+    const { error: updateError } = await supabase
+      .from("donations")
+      .update({
+        checkout_request_id: payment.data.CheckoutRequestID,
+      })
+      .eq("id", donation.id);
+
+    if (updateError) {
+      console.error(
+        "Failed to save checkout request ID:",
+        updateError
+      );
+
+      return redirectToDonation(baseUrl, campaignId, {
+        error:
+          "Payment was initiated, but its tracking information could not be saved. Please contact support before retrying.",
+      });
+    }
+
+    // 4. Redirect to the donation page with tracking information.
+    return redirectToDonation(baseUrl, campaignId, {
+      success: "M-Pesa STK push initiated.",
+      checkoutRequestId: payment.data.CheckoutRequestID,
+    });
+  } catch (error) {
+    console.error("M-Pesa donation request failed:", error);
+
+    // Do not trust request headers or fall back to localhost here.
+    // If APP_URL is missing or invalid, fail rather than redirect
+    // to an untrusted or incorrect host.
+    if (!process.env.APP_URL) {
+      return new Response(
+        "Server configuration error. Please try again later.",
+        { status: 500 }
+      );
+    }
+
+    try {
+      baseUrl = getAppUrl();
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unknown error";
+
+      return redirectToDonation(baseUrl, campaignId, {
+        error: message,
+      });
+    } catch (configurationError) {
+      console.error(
+        "Unable to create error redirect:",
+        configurationError
+      );
+
+      return new Response(
+        "An unexpected error occurred. Please try again later.",
+        { status: 500 }
+      );
+    }
+  }
+}
+
+*/
