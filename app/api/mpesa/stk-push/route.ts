@@ -152,5 +152,7 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("M-Pesa STK push failed:", error);
     return NextResponse.redirect(new URL(buildRedirectPath(`/campaigns/${campaignId || ""}/donate`, { error: message }, "http://localhost:3000"), "http://localhost:3000"));
+    // instead of hardcoding localhost 3000, use .env fie to extract: const baseUrl = process.env.APP_URL!; 
+    //Also in production, change to trusted domain, e.g., https://yourdomain.com
   }
 }
