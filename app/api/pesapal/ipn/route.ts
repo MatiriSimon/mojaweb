@@ -120,3 +120,121 @@ export async function GET(request: Request) {
   }
 }
   */
+
+
+
+
+/*
+If you used POST to register your IPN, you also use POST to receive the IPN. 
+POST is recommended for IPN because it allows for a larger payload and is more secure than GET.
+The following is an example of how to handle the IPN using POST:
+
+
+import { NextResponse, NextRequest } from "next/server";
+
+// Helper to authenticate against Pesapal and retrieve a Bearer token
+async function getPesapalAuthToken(): Promise<string> {
+  const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
+  const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
+  const isLive = process.env.PESAPAL_ENV === "production";
+  
+  const authUrl = isLive
+    ? "https://pay.pesapal.com/v3/api/Auth/RequestToken"
+    : "https://cybqa.pesapal.com/pesapalv3/api/Auth/RequestToken";
+
+  const response = await fetch(authUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify({
+      consumer_key: consumerKey,
+      consumer_secret: consumerSecret,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to authenticate with Pesapal");
+  }
+
+  const data = await response.json();
+  return data.token;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Parse the incoming POST payload sent by Pesapal
+    const body = await request.json();
+    const { OrderTrackingId, OrderNotificationType, OrderMerchantReference } = body;
+
+    if (!OrderTrackingId) {
+      return NextResponse.json(
+        { error: "Missing OrderTrackingId in IPN payload" },
+        { status: 400 }
+      );
+    }
+
+    console.log(`[Pesapal IPN] Received notification for Tracking ID: ${OrderTrackingId}, Reference: ${OrderMerchantReference}`);
+
+    // 2. Authenticate and call Pesapal GetTransactionStatus to get the absolute source of truth
+    const token = await getPesapalAuthToken();
+    const isLive = process.env.PESAPAL_ENV === "production";
+    
+    const statusUrl = isLive
+      ? `https://pay.pesapal.com/v3/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`
+      : `https://cybqa.pesapal.com/pesapalv3/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`;
+
+    const statusResponse = await fetch(statusUrl, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!statusResponse.ok) {
+      throw new Error("Failed to fetch transaction status from Pesapal");
+    }
+
+    const transactionDetails = await statusResponse.json();
+    
+    // Extracted fields from Pesapal verification response
+    const {
+      payment_status_description, // COMPLETED, FAILED, INVALID, REVERSED
+      payment_method,             // MPESA, CARD, etc.
+      amount,
+      confirmation_code,          // M-Pesa or provider confirmation code
+      merchant_reference
+    } = transactionDetails;
+
+    // 3. TODO: Update your internal database status based on payment_status_description
+    // e.g., if (payment_status_description === 'COMPLETED') { markOrderAsPaid(...) }
+    console.log(`[Pesapal Status Verification] Order ${merchant_reference} status: ${payment_status_description} (Code: ${confirmation_code})`);
+
+    // 4. Respond back to Pesapal with the required acknowledgement format
+    // Pesapal expects a confirmation JSON object containing the status code 200
+    return NextResponse.json(
+      {
+        orderNotificationType: OrderNotificationType || "IPNCHANGE",
+        orderTrackingId: OrderTrackingId,
+        orderMerchantReference: OrderMerchantReference,
+        status: 200,
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("[Pesapal IPN Error]:", error);
+    
+    // Return status 500 if processing failed so Pesapal knows to retry later
+    return NextResponse.json(
+      { error: "Internal Server Error processing IPN" },
+      { status: 500 }
+    );
+  }
+}
+
+*/
+ 
