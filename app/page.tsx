@@ -39,7 +39,7 @@ export default async function LandingPage() {
         <p className="text-sm uppercase tracking-[0.35em] text-gray-400">
           Fundraising made simple
         </p>
-        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#14ffe0] [text-shadow:0_0_20px_rgba(57,255,20,0.6)] md:text-6xl">
+        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#c2fff3] [text-shadow:0_0_20px_rgba(162,243,227,0.8)] md:text-6xl">
           Raise support for various causes.
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-gray-400 md:text-xl">
