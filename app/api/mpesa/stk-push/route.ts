@@ -1,3 +1,199 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { initiateStkPush, normalizePhoneNumber } from "@/lib/mpesa/client";
+
+const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
+
+function redirectToDonation(campaignId: string, params: Record<string, string> = {}) {
+  const url = new URL(`/campaigns/${encodeURIComponent(campaignId)}/donate`, APP_URL);
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  return NextResponse.redirect(url.toString());
+}
+
+async function readRequestBody(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return request.json().catch(() => ({}));
+  }
+
+  const formData = await request.formData().catch(() => null);
+  if (!formData) return {};
+
+  return Object.fromEntries(formData.entries());
+}
+
+export async function POST(request: Request) {
+  let campaignId = "";
+
+  try {
+    const body = await readRequestBody(request);
+    campaignId = String(body.campaignId ?? body.campaign_id ?? "").trim();
+
+    const amount = Number(body.amount ?? 0);
+    const phone = String(body.phone ?? "").trim();
+    const donorName = String(body.donorName ?? body.donor_name ?? "").trim();
+    const message = String(body.message ?? "").trim();
+
+    const normalizedPhone = normalizePhoneNumber(phone);
+
+    if (!campaignId || !amount || amount <= 0 || !normalizedPhone) {
+      return redirectToDonation(campaignId || "", {
+        error: "Campaign ID, amount and phone number are required.",
+      });
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    let donorId: string | null = null;
+    const standardName = donorName || user?.email?.split("@")[0] || "Anonymous Guest";
+
+    if (user) {
+      const { data: existingDonor } = await supabase
+        .from("donors")
+        .select("id")
+        .eq("profiles_id", user.id)
+        .maybeSingle();
+
+      if (existingDonor) {
+        donorId = existingDonor.id;
+      } else {
+        const { data: newDonor, error: donorError } = await supabase
+          .from("donors")
+          .insert({
+            profiles_id: user.id,
+            full_name: standardName,
+            email: user.email,
+          })
+          .select("id")
+          .single();
+
+        if (donorError || !newDonor) {
+          return redirectToDonation(campaignId, {
+            error: "Unable to create donor profile.",
+          });
+        }
+
+        donorId = newDonor.id;
+      }
+    } else {
+      const { data: guestDonor, error: guestError } = await supabase
+        .from("donors")
+        .insert({
+          profiles_id: null,
+          full_name: standardName,
+          email: null,
+          phone_number: normalizedPhone,
+        })
+        .select("id")
+        .single();
+
+      if (guestError || !guestDonor) {
+        return redirectToDonation(campaignId, {
+          error: "Unable to create guest donor profile.",
+        });
+      }
+
+      donorId = guestDonor.id;
+    }
+
+    const { data: campaign, error: campaignError } = await supabase
+      .from("campaigns")
+      .select("id, title")
+      .eq("id", campaignId)
+      .single();
+
+    if (campaignError || !campaign) {
+      return redirectToDonation(campaignId, {
+        error: "Campaign not found.",
+      });
+    }
+
+    const { data: donation, error: donationError } = await supabase
+      .from("donations")
+      .insert({
+        campaign_id: campaignId,
+        donor_id: donorId,
+        donor_name: standardName,
+        campaign_title: campaign.title,
+        amount,
+        currency: "KES",
+        gateway: "mpesa",
+        payment_status: "pending",
+        message: message || null,
+        checkout_request_id: null,
+        mpesa_receipt: null,
+      })
+      .select("id")
+      .single();
+
+    if (donationError || !donation) {
+      return redirectToDonation(campaignId, {
+        error: donationError?.message ?? "Unable to create donation record.",
+      });
+    }
+
+    console.log("M-Pesa STK push request:", {
+      phone: normalizedPhone,
+      amount,
+      accountReference: donation.id,
+      transactionDesc: `Donation for ${campaign.title}`,
+    });
+
+    const payment = await initiateStkPush({
+      phone: normalizedPhone,
+      amount,
+      accountReference: donation.id,
+      transactionDesc: `Donation for ${campaign.title}`,
+    });
+
+    if (!payment.ok || !payment.data?.CheckoutRequestID) {
+      return redirectToDonation(campaignId, {
+        error: "Unable to start M-Pesa payment request.",
+      });
+    }
+
+    await supabase
+      .from("donations")
+      .update({ checkout_request_id: payment.data.CheckoutRequestID })
+      .eq("id", donation.id);
+
+    return redirectToDonation(campaignId, {
+      success: "M-Pesa STK push initiated.",
+      checkoutRequestId: payment.data.CheckoutRequestID,
+    });
+  } catch (error) {
+    console.error("M-Pesa donation request failed:", error);
+
+    const message = error instanceof Error ? error.message : "Unknown error";
+
+    return redirectToDonation(campaignId || "", {
+      error: message,
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -156,6 +352,15 @@ export async function POST(request: Request) {
     //Also in production, change to trusted domain, e.g., https://yourdomain.com
   }
 }
+*/
+
+
+
+
+
+
+
+
 
 /*
 THIS IS GENERALLY PASTED HERE JUST TO REVEAL A SAFER STK PUSH MODULE THAT DOES NOT RELY ON UNTRUSTED REQUEST HEADERS OR FALLBACKS TO LOCALHOST.
