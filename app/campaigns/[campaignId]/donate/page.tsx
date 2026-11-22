@@ -24,7 +24,7 @@ export default async function DonatePage({ params, searchParams }: DonatePagePro
         <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
           <p className="text-[11px] uppercase tracking-[0.35em] text-gray-500">Support the cause</p>
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">Make a donation</h1>
-          <p className="mt-2 text-gray-600">Enter your amount and phone number to start an M-Pesa STK Push request.</p>
+          <p className="mt-2 text-gray-600">Choose M-Pesa or Paystack, enter the donation details, and continue to a secure payment.</p>
 
           <form action="/api/mpesa/stk-push" method="post" className="mt-6 space-y-5">
             {message ? <p className="rounded-2xl bg-gray-100 p-3 text-sm text-gray-700">{message}</p> : null}
@@ -53,6 +53,40 @@ export default async function DonatePage({ params, searchParams }: DonatePagePro
 
             <button type="submit" className="w-full rounded-xl bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800">
               Pay with M-Pesa
+            </button>
+          </form>
+
+          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-gray-400">
+            <span className="h-px flex-1 bg-gray-200" />
+            or
+            <span className="h-px flex-1 bg-gray-200" />
+          </div>
+
+          <form action="/api/paystack/initialize" method="post" className="space-y-5">
+            <input type="hidden" name="campaignId" value={campaignId} />
+
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Amount (KES)</label>
+              <input name="amount" type="number" min="1" required className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="1000" />
+            </div>
+
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Email address</label>
+              <input name="email" type="email" required className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="you@example.com" />
+            </div>
+
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Your name (optional)</label>
+              <input name="donorName" className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="Jane Doe" />
+            </div>
+
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Message (optional)</label>
+              <textarea name="message" rows={4} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-black" placeholder="Wishing you strength and support."></textarea>
+            </div>
+
+            <button type="submit" className="w-full rounded-xl border border-black px-4 py-3 text-sm font-medium text-black transition hover:bg-gray-100">
+              Pay securely with Paystack
             </button>
           </form>
         </div>
