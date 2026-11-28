@@ -36,7 +36,18 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
     );
   }
 
-  const raised = Number(campaign.current_amount ?? 0);
+  const { data: donations, error: donationsError } = await supabase
+    .from("donations")
+    .select("id, donor_name, amount, currency, created_at")
+    .eq("campaign_id", campaignId)
+    .eq("payment_status", "completed")
+    .order("created_at", { ascending: false });
+
+  const completedDonations = donations ?? [];
+  const raised = completedDonations.reduce(
+    (total, donation) => total + Number(donation.amount ?? 0),
+    0,
+  );
   const goal = Number(campaign.goal_amount ?? 1);
 
   return (
@@ -56,13 +67,12 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
             <div className="flex h-64 w-full items-center justify-center rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">No image provided</div>
           )}
 
-          
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">{campaign.title}</h1>
           <p className="mt-4 text-gray-700">{campaign.description}</p>
         </article>
 
         <aside className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Current progress</p>
+          <p className="text-sm text-gray-500">Total donated</p>
           <h2 className="mt-2 text-3xl font-bold text-gray-900">KES {raised.toLocaleString()}</h2>
           <p className="text-sm text-gray-500">Goal: KES {goal.toLocaleString()}</p>
 
@@ -84,6 +94,57 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
 
           <p className="mt-4 text-xs text-gray-500">This fundraiser can be shared with family, friends, and community donors.</p>
         </aside>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-12">
+        <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm uppercase tracking-[0.25em] text-gray-500">Supporters</p>
+              <h2 className="mt-2 text-2xl font-bold">Donation list</h2>
+            </div>
+            <p className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
+              {completedDonations.length} {completedDonations.length === 1 ? "donation" : "donations"}
+            </p>
+          </div>
+
+          {donationsError ? (
+            <p className="mt-6 rounded-2xl bg-red-50 p-4 text-sm text-red-700">
+              We could not load the donation list.
+            </p>
+          ) : completedDonations.length === 0 ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-gray-300 p-8 text-center">
+              <p className="font-medium text-gray-700">No completed donations yet</p>
+              <p className="mt-1 text-sm text-gray-500">Be the first person to support this campaign.</p>
+            </div>
+          ) : (
+            <ul className="mt-6 divide-y divide-gray-100">
+              {completedDonations.map((donation) => {
+                const donatedAt = donation.created_at
+                  ? new Date(donation.created_at).toLocaleDateString("en-KE", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "";
+
+                return (
+                  <li key={donation.id} className="flex items-center justify-between gap-4 py-4">
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {donation.donor_name?.trim() || "Anonymous donor"}
+                      </p>
+                      {donatedAt ? <p className="mt-1 text-xs text-gray-500">{donatedAt}</p> : null}
+                    </div>
+                    <p className="shrink-0 text-lg font-bold text-gray-900">
+                      {donation.currency || "KES"} {Number(donation.amount ?? 0).toLocaleString()}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </section>
     </main>
   );
